@@ -25,8 +25,8 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
 
       # - name: Build and push
@@ -49,7 +49,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.DOCKER_TOKEN}}
+          password: ${{ secrets.GHCR_TOKEN}}
 
       # Budowanie i publikacja gotowych obrazów na GitHub Container Registry - repozytorium zad1dod1, tag serwer, platformy amd64, armv7 i arm64, eksport cache
       - name: Build and push
