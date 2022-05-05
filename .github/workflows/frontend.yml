@@ -1,0 +1,65 @@
+name: GitHub Action next2 flow to Docker hub 
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-push-images:
+    name: Budowa i publikacja obrazw na repozytorium
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: qemu install
+        id: qemu
+        uses: docker/setup-qemu-action@v1
+
+      - name: Buildx set-up
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+
+      # - name: Build and push
+      #   id: docker_build
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     platforms: linux/arm/v7,linux/arm64/v8,linux/amd64
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: |
+      #       ajres/sprawozdaniezadanie1:bx
+      #     cache-from: type=registry,ref=ajres/sprawozdaniezadanie1:bx
+      #     cache-to: type=inline
+        
+        
+      # Logowanie na GitHub Container Registry za pomocą nazwy użytkownika znajdującej się w zmiennej actor pobranej z kontekstu github oraz Personal Access Token znajdującego się w repozytorium jako tzw. sekret
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_TOKEN}}
+
+      # Budowanie i publikacja gotowych obrazów na GitHub Container Registry - repozytorium zad1dod1, tag serwer, platformy amd64, armv7 i arm64, eksport cache
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          platforms: linux/arm/v7,linux/arm64/v8,linux/amd64
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/gvbriel/gp_zadanie1:bx
+          cache-from: type=registry,ref=ghcr.io/gvbriel/gp_zadanie1:bx
+          cache-to: type=inline
